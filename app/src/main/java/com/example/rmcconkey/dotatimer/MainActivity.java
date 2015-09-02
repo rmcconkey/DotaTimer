@@ -1,16 +1,26 @@
 package com.example.rmcconkey.dotatimer;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.NumberPicker;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
+
+    private NumberPicker numberPicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
+        numberPicker.setMaxValue(9);
+        numberPicker.setMinValue(0);
     }
 
     @Override
@@ -34,4 +44,8 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void setTime(View view) {
+        DialogFragment newFragment = new TimePickerFragment();
+        newFragment.show(getFragmentManager(), "timePicker");    }
 }
