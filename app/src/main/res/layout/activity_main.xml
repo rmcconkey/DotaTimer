@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,21 +9,63 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/timePickerButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/mainClock"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:onClick="setTime"
-        android:text="Set Time" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
 
-    <NumberPicker
-        android:id="@+id/numberPicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/timePickerButton" />
+        <TextView
+            android:id="@+id/mainClockHours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/main_clock_style"
+            android:onClick="setSyncTime"
+            android:text="0"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/main_clock_style"
+            android:onClick="setSyncTime"
+            android:text=":"/>
+
+        <TextView
+            android:id="@+id/mainClockMinutes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/main_clock_style"
+            android:onClick="setSyncTime"
+            android:text="00"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/main_clock_style"
+            android:onClick="setSyncTime"
+            android:text=":"/>
+
+        <TextView
+            android:id="@+id/mainClockSeconds"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/main_clock_style"
+            android:onClick="setSyncTime"
+            android:text="00"/>
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="fill_parent"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Sync!"/>
+
+    </LinearLayout>
+
 
 </RelativeLayout>
