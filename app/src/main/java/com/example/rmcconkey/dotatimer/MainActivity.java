@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,9 +20,27 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
     private final String TAG = this.getClass().getSimpleName();
 
+    private enum TimeValueType { HOURS, MINUTES, SECONDS};
+
     private TextView mainClockHours;
     private TextView mainClockMinutes;
     private TextView mainClockSeconds;
+
+    private Button syncButton;
+
+    private int hours;
+    private int minutes;
+    private int seconds;
+
+    private Handler timerHandler = new Handler();
+    private Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            tick();
+            timerHandler.postDelayed(this, 1000);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +51,29 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         mainClockMinutes = (TextView)findViewById(R.id.mainClockMinutes);
         mainClockSeconds = (TextView)findViewById(R.id.mainClockSeconds);
 
+        syncButton = (Button)findViewById(R.id.syncButton);
+        syncButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Button b = (Button) v;
+                if (b.getText().equals("Stop")) {
+                    timerHandler.removeCallbacks(timerRunnable);
+                    b.setText("Sync");
+                } else {
+                    timerHandler.postDelayed(timerRunnable, 0);
+                    b.setText("Stop");
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        timerHandler.removeCallbacks(timerRunnable);
+        syncButton.setText("Sync");
     }
 
     @Override
@@ -60,10 +102,11 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
         final Dialog d = new Dialog(MainActivity.this);
         d.setContentView(R.layout.dialog);
-        final TextView tv;
+
         String title;
         final NumberPicker np1;
         final NumberPicker np2;
+        final TimeValueType timeValueType;
 
 
         np1 = (NumberPicker) d.findViewById(R.id.numberPicker1);
@@ -88,24 +131,22 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
         switch (view.getId()) {
             case R.id.mainClockHours :
-                tv = mainClockHours;
                 np1.setVisibility(View.INVISIBLE);
                 title = "Set hour value:";
+                timeValueType = TimeValueType.HOURS;
                 break;
             case R.id.mainClockMinutes :
-                tv = mainClockMinutes;
-                Toast.makeText(this, "mainClockMinutes", Toast.LENGTH_LONG).show();
                 title = "Set minutes value:";
+                timeValueType = TimeValueType.MINUTES;
                 break;
             case R.id.mainClockSeconds :
-                tv = mainClockSeconds;
-                Toast.makeText(this, "mainClockSeconds", Toast.LENGTH_LONG).show();
                 title = "Set seconds value:";
+                timeValueType = TimeValueType.SECONDS;
                 break;
             default :
                 Toast.makeText(this, "Error: view.getId() not found", Toast.LENGTH_LONG).show();
                 title = "default title";
-                tv = null;
+                timeValueType = null;
         }
 
         d.setTitle(title);
@@ -114,12 +155,19 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         Button cancelButton = (Button) d.findViewById(R.id.dialogButtonCancel);
 
         final Context context = this;
-
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String value = String.valueOf(np1.getValue()) + String.valueOf(np2.getValue());
-                tv.setText(String.valueOf(value));
+                if (timeValueType == TimeValueType.HOURS) {
+                    hours = np2.getValue();
+                } else if (timeValueType == TimeValueType.MINUTES) {
+                    minutes = np1.getValue()*10 + np2.getValue();
+                } else if (timeValueType == TimeValueType.SECONDS) {
+                    seconds = np1.getValue()*10 + np2.getValue();
+                } else {
+                    Toast.makeText(context, "Error: timeValueType not set", Toast.LENGTH_LONG).show();
+                }
+                updateMainClock();
                 d.dismiss();
             }
         });
@@ -137,5 +185,49 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     @Override
     public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
         //Toast.makeText(this, "newVal = " + newVal, Toast.LENGTH_LONG).show();
+    }
+
+    private void updateMainClock() {
+        mainClockHours.setText(String.valueOf(hours));
+        if (minutes<10) {
+            mainClockMinutes.setText("0" + String.valueOf(minutes));
+        } else {
+            mainClockMinutes.setText(String.valueOf(minutes));
+        }
+        if (seconds<10) {
+            mainClockSeconds.setText("0" + String.valueOf(seconds));
+        } else {
+            mainClockSeconds.setText(String.valueOf(seconds));
+        }
+    }
+
+    public void resetMainClock(View view) {
+        hours = 0;
+        minutes = 0;
+        seconds = 0;
+        updateMainClock();
+    }
+
+    private void tick() {
+
+        seconds++;
+        if (seconds>59) {
+            seconds = 0;
+            minutes++;
+        }
+        if (minutes>59) {
+            minutes = 0;
+            hours++;
+        }
+        if (hours>9) {
+            hours = 0;
+        }
+        updateMainClock();
+
+        checkNeutralCampTimer();
+    }
+
+    private void checkNeutralCampTimer() {
+
     }
 }

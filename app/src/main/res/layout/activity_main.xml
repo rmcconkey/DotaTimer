@@ -59,13 +59,32 @@
             android:layout_width="20dp"
             android:layout_height="fill_parent"/>
 
-        <Button
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Sync!"/>
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/syncButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Sync"/>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="5dp"/>
+
+            <Button
+                android:id="@+id/resetButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Reset"
+                android:onClick="resetMainClock"/>
+
+        </LinearLayout>
 
     </LinearLayout>
-
 
 </RelativeLayout>
