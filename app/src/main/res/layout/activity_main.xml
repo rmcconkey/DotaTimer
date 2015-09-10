@@ -103,12 +103,13 @@
                 android:layout_gravity="left"
                 android:textSize="18sp"/>
 
-            <View
+            <TextView
+                android:id="@+id/neutral_camp_alert_time_display"
+                android:text=":53"
+                android:onClick="setAlertTime"
                 style="@style/table_cell_style"/>
 
-            <TextView
-                android:id="@+id/neutral_camp_alert_time"
-                android:text=":53"
+            <View
                 style="@style/table_cell_style"/>
 
             <Switch
@@ -128,12 +129,13 @@
                 android:layout_gravity="left"
                 android:textSize="18sp"/>
 
-            <View
+            <TextView
+                android:id="@+id/rune_alert_time_display"
+                android:text="1:30"
+                android:onClick="setAlertTime"
                 style="@style/table_cell_style"/>
 
-            <TextView
-                android:id="@+id/rune_alert_time"
-                android:text="1:30"
+            <View
                 style="@style/table_cell_style"/>
 
             <Switch
@@ -160,6 +162,7 @@
                 style="@style/table_cell_style"/>
 
             <TextView
+                android:id="@+id/roshan_countdown"
                 android:text="8:00"
                 style="@style/table_cell_style"/>
 
@@ -181,13 +184,15 @@
                 android:textSize="18sp"/>
 
             <TextView
-                android:id="@+id/aegis_reclaim_alert_time"
+                android:id="@+id/aegis_reclaim_alert_time_display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=":59"
+                android:onClick="setAlertTime"
                 style="@style/table_cell_style"/>
 
             <TextView
+                android:id="@+id/aegis_countdown"
                 android:text="6:00"
                 style="@style/table_cell_style"/>
 

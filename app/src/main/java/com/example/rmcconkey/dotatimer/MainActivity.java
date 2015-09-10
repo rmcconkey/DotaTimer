@@ -17,6 +17,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 public class MainActivity extends Activity implements NumberPicker.OnValueChangeListener
 {
 
@@ -27,6 +29,13 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private TextView mainClockHours;
     private TextView mainClockMinutes;
     private TextView mainClockSeconds;
+
+    private TextView roshanCountdown;
+    private TextView aegisCountdown;
+
+    private TextView neutralCampAlertTimeDisplay;
+    private TextView runeAlertTimeDisplay;
+    private TextView aegisAlertTimeDisplay;
 
     private Button syncButton;
 
@@ -80,6 +89,13 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         mainClockMinutes = (TextView)findViewById(R.id.mainClockMinutes);
         mainClockSeconds = (TextView)findViewById(R.id.mainClockSeconds);
 
+        roshanCountdown = (TextView)findViewById(R.id.roshan_countdown);
+        aegisCountdown = (TextView)findViewById(R.id.aegis_countdown);
+
+        neutralCampAlertTimeDisplay = (TextView)findViewById(R.id.neutral_camp_alert_time_display);
+        runeAlertTimeDisplay = (TextView)findViewById(R.id.rune_alert_time_display);
+        aegisAlertTimeDisplay = (TextView)findViewById(R.id.aegis_reclaim_alert_time_display);
+
         neutralCampSwitch = (Switch)findViewById(R.id.neutralCampSwitch);
         runeSwitch = (Switch)findViewById(R.id.runeSwitch);
         roshanSwitch = (Switch)findViewById(R.id.roshanSwitch);
@@ -110,6 +126,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         super.onResume();
 
         loadSettings();
+        updateAlertTimers();
     }
 
     private void loadSettings() {
@@ -122,6 +139,26 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         runeSwitch.setChecked(prefs.getBoolean(RUNE_SWITCH, false));
         roshanSwitch.setChecked(prefs.getBoolean(ROSHAN_SWITCH, false));
         aegisSwitch.setChecked(prefs.getBoolean(AEGIS_SWITCH, false));
+    }
+
+    private void updateAlertTimers() {
+        if (neutralAlertTime<10) {
+            neutralCampAlertTimeDisplay.setText(":0" + String.valueOf(neutralAlertTime));
+        } else {
+            neutralCampAlertTimeDisplay.setText(":" + String.valueOf(neutralAlertTime));
+        }
+
+        if (runeAlertTime<10) {
+            runeAlertTimeDisplay.setText(":0" + String.valueOf(runeAlertTime));
+        } else {
+            runeAlertTimeDisplay.setText(":" + String.valueOf(runeAlertTime));
+        }
+
+        if (aegisAlertTime<10) {
+            aegisAlertTimeDisplay.setText(":0" + String.valueOf(aegisAlertTime));
+        } else {
+            aegisAlertTimeDisplay.setText(":" + String.valueOf(aegisAlertTime));
+        }
     }
 
     @Override
@@ -311,5 +348,9 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         if (minutes%2==1 && runeAlertEnabled) {
 
         }
+    }
+
+    public void setAlertTime(View view) {
+
     }
 }
