@@ -25,6 +25,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private final String TAG = this.getClass().getSimpleName();
 
     private enum TimeValueType { HOURS, MINUTES, SECONDS};
+    private enum AlertType {NEUTRAL_CAMP, RUNE, AEGIS_RECLAIM};
 
     private TextView mainClockHours;
     private TextView mainClockMinutes;
@@ -149,9 +150,9 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         }
 
         if (runeAlertTime<10) {
-            runeAlertTimeDisplay.setText(":0" + String.valueOf(runeAlertTime));
+            runeAlertTimeDisplay.setText("1:0" + String.valueOf(runeAlertTime));
         } else {
-            runeAlertTimeDisplay.setText(":" + String.valueOf(runeAlertTime));
+            runeAlertTimeDisplay.setText("1:" + String.valueOf(runeAlertTime));
         }
 
         if (aegisAlertTime<10) {
@@ -218,7 +219,6 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         final NumberPicker np1;
         final NumberPicker np2;
         final TimeValueType timeValueType;
-
 
         np1 = (NumberPicker) d.findViewById(R.id.numberPicker1);
         if (np1 != null) {
@@ -340,17 +340,99 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     }
 
     private void checkTimers() {
-
+        checkNeutralCampTimer();
         checkRuneTimer();
     }
 
-    private void checkRuneTimer() {
-        if (minutes%2==1 && runeAlertEnabled) {
+    private void checkNeutralCampTimer() {
+        if (seconds == neutralAlertTime && neutralAlertEnabled) {
+            Toast.makeText(this, "Neutral Camp Alert!", Toast.LENGTH_LONG).show();
+        }
+    }
 
+    private void checkRuneTimer() {
+        if (minutes%2==1 && seconds==runeAlertTime && runeAlertEnabled) {
+            Toast.makeText(this, "Rune Alert!", Toast.LENGTH_LONG).show();
         }
     }
 
     public void setAlertTime(View view) {
+        final Dialog d = new Dialog(MainActivity.this);
+        d.setContentView(R.layout.dialog);
+
+        String title = "Set alert value:";
+        final NumberPicker np1;
+        final NumberPicker np2;
+        final AlertType alertType;
+
+        np1 = (NumberPicker) d.findViewById(R.id.numberPicker1);
+        if (np1 != null) {
+            np1.setMaxValue(5);
+            np1.setMinValue(0);
+            np1.setWrapSelectorWheel(true);
+            np1.setOnValueChangedListener(this);
+        } else {
+            Log.e(TAG, "Error: np1 is null");
+        }
+
+        np2 = (NumberPicker) d.findViewById(R.id.numberPicker2);
+        if (np2 != null) {
+            np2.setMaxValue(9);
+            np2.setMinValue(0);
+            np2.setWrapSelectorWheel(true);
+            np2.setOnValueChangedListener(this);
+        } else {
+            Log.e(TAG, "Error: np2 is null");
+        }
+
+        switch (view.getId()) {
+            case R.id.neutral_camp_alert_time_display :
+                alertType = AlertType.NEUTRAL_CAMP;
+                break;
+            case R.id.rune_alert_time_display :
+                alertType = AlertType.RUNE;
+                break;
+            case R.id.aegis_reclaim_alert_time_display :
+                alertType = AlertType.AEGIS_RECLAIM;
+                break;
+            default :
+                Toast.makeText(this, "Error: view.getId() not found", Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Error: view.getId() not found");
+                title = "default title";
+                alertType = null;
+        }
+
+        d.setTitle(title);
+
+        Button setButton = (Button) d.findViewById(R.id.dialogButtonSet);
+        Button cancelButton = (Button) d.findViewById(R.id.dialogButtonCancel);
+
+        final Context context = this;
+        setButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (alertType == AlertType.NEUTRAL_CAMP) {
+                    neutralAlertTime = np1.getValue()*10 + np2.getValue();
+                } else if (alertType == AlertType.RUNE) {
+                    runeAlertTime = np1.getValue()*10 + np2.getValue();
+                } else if (alertType == AlertType.AEGIS_RECLAIM.AEGIS_RECLAIM) {
+                    aegisAlertTime = np1.getValue()*10 + np2.getValue();
+                } else {
+                    Toast.makeText(context, "Error: timeValueType not set", Toast.LENGTH_LONG).show();
+                }
+                updateAlertTimers();
+                d.dismiss();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                d.dismiss();
+            }
+        });
+
+        d.show();
 
     }
 }
