@@ -32,6 +32,11 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private int minutes;
     private int seconds;
 
+    private boolean neutralAlertEnabled = true;
+    private boolean runeAlertEnabled = true;
+    private boolean roshanAlertEnabled = true;
+    private boolean aegisAlertEnabled = true;
+
     private Handler timerHandler = new Handler();
     private Runnable timerRunnable = new Runnable() {
 
@@ -224,10 +229,17 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         }
         updateMainClock();
 
-        checkNeutralCampTimer();
+        checkTimers();
     }
 
-    private void checkNeutralCampTimer() {
+    private void checkTimers() {
 
+        checkRuneTimer();
+    }
+
+    private void checkRuneTimer() {
+        if (minutes%2==1 && runeAlertEnabled) {
+
+        }
     }
 }

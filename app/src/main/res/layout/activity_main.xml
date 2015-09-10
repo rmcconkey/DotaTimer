@@ -87,101 +87,119 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/neutral_camp_spawn"
+    <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_below="@+id/mainClock"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Neutral camp spawn"
-            android:layout_gravity="left"
-            android:textSize="18sp"/>
-
-        <View
-            android:layout_width="20dp"
-            android:layout_height="fill_parent"/>
-
-        <Switch
-            android:id="@+id/switch1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:gravity="right"
-            />
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/runes"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/neutral_camp_spawn"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:orientation="horizontal">
+        android:layout_marginTop="40dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Runes"
-            android:layout_gravity="left"
-            android:textSize="18sp"/>
+        <TableRow>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Neutral camps"
+                android:layout_gravity="left"
+                android:textSize="18sp"/>
 
-        <View
-            android:layout_width="20dp"
-            android:layout_height="fill_parent"/>
+            <View
+                style="@style/table_cell_style"/>
 
-        <Switch
-            android:id="@+id/switch2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:gravity="right"
-            />
+            <TextView
+                android:id="@+id/neutral_camp_alert"
+                android:text="0:07"
+                style="@style/table_cell_style"/>
 
-    </LinearLayout>
+            <Switch
+                android:id="@+id/neutralCampSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="right"
+                />
+        </TableRow>
 
-    <LinearLayout
-        android:id="@+id/roshan"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/runes"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:orientation="horizontal">
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Runes"
+                android:layout_gravity="left"
+                android:textSize="18sp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Roshan"
-            android:layout_gravity="left"
-            android:textSize="18sp"/>
+            <View
+                style="@style/table_cell_style"/>
 
-        <View
-            android:layout_width="20dp"
-            android:layout_height="fill_parent"/>
+            <TextView
+                android:id="@+id/rune_alert"
+                android:text="0:30"
+                style="@style/table_cell_style"/>
 
-        <Switch
-            android:id="@+id/switch3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:gravity="right"
-            />
+            <Switch
+                android:id="@+id/runeSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="right"
+                />
+        </TableRow>
 
-    </LinearLayout>
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Roshan"
+                android:layout_gravity="left"
+                android:textSize="18sp"/>
+
+            <Button
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:text="Dead"
+                style="@style/table_cell_style"/>
+
+            <TextView
+                android:text="8:00"
+                style="@style/table_cell_style"/>
+
+            <Switch
+                android:id="@+id/roshanSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="right"
+                />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aegis reclaim"
+                android:layout_gravity="left"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/aegis_reclaim_alert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1:00"
+                style="@style/table_cell_style"/>
+
+            <TextView
+                android:text="6:00"
+                style="@style/table_cell_style"/>
+
+            <Switch
+                android:id="@+id/aegisSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="right"
+                />
+        </TableRow>
+
+    </TableLayout>
 
 </RelativeLayout>
