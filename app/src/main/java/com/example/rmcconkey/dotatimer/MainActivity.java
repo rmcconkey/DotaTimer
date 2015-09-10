@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -98,9 +99,33 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         aegisAlertTimeDisplay = (TextView)findViewById(R.id.aegis_reclaim_alert_time_display);
 
         neutralCampSwitch = (Switch)findViewById(R.id.neutralCampSwitch);
+        neutralCampSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                neutralAlertEnabled = isChecked;
+            }
+        });
         runeSwitch = (Switch)findViewById(R.id.runeSwitch);
+        runeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                runeAlertEnabled = isChecked;
+            }
+        });
         roshanSwitch = (Switch)findViewById(R.id.roshanSwitch);
+        roshanSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                roshanAlertEnabled = isChecked;
+            }
+        });
         aegisSwitch = (Switch)findViewById(R.id.aegisSwitch);
+        aegisSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                aegisAlertEnabled = isChecked;
+            }
+        });
 
         syncButton = (Button)findViewById(R.id.syncButton);
         syncButton.setOnClickListener(new View.OnClickListener() {
