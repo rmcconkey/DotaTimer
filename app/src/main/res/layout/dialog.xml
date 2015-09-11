@@ -32,18 +32,29 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/dialog_help_message"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/numberPickersBlock"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="20dp"
+        android:text="Help message"
+        android:textSize="20dp"/>
+
 
     <Button
         android:id="@+id/dialogButtonSet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/numberPickersBlock"
+        android:layout_marginTop="20dp"
+        android:text="Set"
+        android:layout_below="@+id/dialog_help_message"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="40dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginBottom="20dp"
-        android:text="Set"/>
+        />
 
     <Button
         android:id="@+id/dialogButtonCancel"

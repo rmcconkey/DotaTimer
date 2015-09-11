@@ -38,6 +38,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private TextView neutralCampAlertTimeDisplay;
     private TextView runeAlertTimeDisplay;
     private TextView aegisAlertTimeDisplay;
+    private TextView dialogHelpMessage;
 
     private Button syncButton;
 
@@ -187,9 +188,9 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         }
 
         if (runeAlertTime<10) {
-            runeAlertTimeDisplay.setText("1:0" + String.valueOf(runeAlertTime));
+            runeAlertTimeDisplay.setText(":0" + String.valueOf(runeAlertTime));
         } else {
-            runeAlertTimeDisplay.setText("1:" + String.valueOf(runeAlertTime));
+            runeAlertTimeDisplay.setText(":" + String.valueOf(runeAlertTime));
         }
 
         if (aegisAlertTime<10) {
@@ -299,6 +300,8 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         }
 
         d.setTitle(title);
+        dialogHelpMessage = (TextView)d.findViewById(R.id.dialog_help_message);
+        dialogHelpMessage.setText("");
 
         Button setButton = (Button) d.findViewById(R.id.dialogButtonSet);
         Button cancelButton = (Button) d.findViewById(R.id.dialogButtonCancel);
@@ -500,15 +503,19 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
             Log.e(TAG, "Error: np2 is null");
         }
 
+        dialogHelpMessage = (TextView)d.findViewById(R.id.dialog_help_message);
         switch (view.getId()) {
             case R.id.neutral_camp_alert_time_display :
                 alertType = AlertType.NEUTRAL_CAMP;
+                dialogHelpMessage.setText(getString(R.string.neutral_camp_help_message));
                 break;
             case R.id.rune_alert_time_display :
                 alertType = AlertType.RUNE;
+                dialogHelpMessage.setText(getString(R.string.rune_help_message));
                 break;
             case R.id.aegis_reclaim_alert_time_display :
                 alertType = AlertType.AEGIS_RECLAIM;
+                dialogHelpMessage.setText(getString(R.string.aegis_reclaim_help_message));
                 break;
             default :
                 Toast.makeText(this, "Error: view.getId() not found", Toast.LENGTH_LONG).show();
