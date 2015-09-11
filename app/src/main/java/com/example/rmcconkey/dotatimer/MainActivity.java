@@ -55,8 +55,10 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private int aegisCountdownMinutes = 6;
     private int aegisCountdownSeconds = 0;
 
+    private boolean isMainClockEnabled = false;
     private boolean isRoshanCountingdown = false;
     private boolean isAegisCountingdown = false;
+    private boolean isRoshanTimerReversed = false;
 
     private boolean neutralAlertEnabled = true;
     private boolean runeAlertEnabled = true;
@@ -143,9 +145,11 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
                 Button b = (Button) v;
                 if (b.getText().equals("Stop")) {
                     timerHandler.removeCallbacks(timerRunnable);
+                    isMainClockEnabled = false;
                     b.setText("Sync");
                 } else {
                     timerHandler.postDelayed(timerRunnable, 0);
+                    isMainClockEnabled = true;
                     b.setText("Stop");
                 }
             }
@@ -393,26 +397,51 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     }
 
     private void updateCountdownTimers() {
-        String text;
+        String text = null;
         if (roshanSwitch.isChecked() && isRoshanCountingdown) {
-            if (roshanCountdownSeconds == 0) {
-                roshanCountdownMinutes--;
-                roshanCountdownSeconds = 59;
+
+            if (!isRoshanTimerReversed) {
+                if (roshanCountdownSeconds == 0 && roshanCountdownMinutes != 0) {
+                    roshanCountdownMinutes--;
+                    roshanCountdownSeconds = 59;
+                } else if (roshanCountdownSeconds == 0 && roshanCountdownMinutes == 0) {
+                    isRoshanTimerReversed = true;
+                    roshanCountdownSeconds = 1;
+                } else {
+                    roshanCountdownSeconds--;
+                }
             } else {
-                roshanCountdownSeconds--;
+                if (roshanCountdownSeconds == 59 && roshanCountdownMinutes != 2) {
+                    roshanCountdownMinutes++;
+                    roshanCountdownSeconds = 0;
+                } else if (roshanCountdownSeconds == 59 && roshanCountdownMinutes == 2) {
+                    roshanCountdownSeconds = 0;
+                    roshanCountdownMinutes = 3;
+                    isRoshanCountingdown = false;
+                } else {
+                    roshanCountdownSeconds++;
+                }
+            }
+
+            if (isRoshanTimerReversed) {
+                text = "-";
+            } else {
+                text = "";
             }
             if (roshanCountdownSeconds<10) {
-                text = String.valueOf(roshanCountdownMinutes) + ":0" + String.valueOf(roshanCountdownSeconds);
+                text += String.valueOf(roshanCountdownMinutes) + ":0" + String.valueOf(roshanCountdownSeconds);
             } else {
-                text = String.valueOf(roshanCountdownMinutes) + ":0" + String.valueOf(roshanCountdownSeconds);
+                text += String.valueOf(roshanCountdownMinutes) + ":" + String.valueOf(roshanCountdownSeconds);
             }
             roshanCountdownDisplay.setText(text);
         }
 
         if (aegisSwitch.isChecked() && isAegisCountingdown) {
-            if (aegisCountdownSeconds == 0) {
+            if (aegisCountdownSeconds == 0 && aegisCountdownMinutes != 0) {
                 aegisCountdownMinutes--;
                 aegisCountdownSeconds = 59;
+            } else if (aegisCountdownSeconds == 0 && aegisCountdownMinutes == 0) {
+                isAegisCountingdown = false;
             } else {
                 aegisCountdownSeconds--;
             }
@@ -426,12 +455,20 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     }
 
     public void startRoshanCountdown(View view){
-        isRoshanCountingdown = true;
-        isAegisCountingdown = true;
+        if (isMainClockEnabled) {
+            isRoshanCountingdown = true;
+            isAegisCountingdown = true;
+        } else {
+            isRoshanCountingdown = false;
+            isAegisCountingdown = false;
+        }
         roshanCountdownMinutes = 8;
         roshanCountdownSeconds = 0;
         aegisCountdownMinutes = 6;
         aegisCountdownSeconds = 0;
+        roshanCountdownDisplay.setText("8:00");
+        aegisCountdownDisplay.setText("6:00");
+        isRoshanTimerReversed = false;
     }
 
     public void setAlertTime(View view) {
