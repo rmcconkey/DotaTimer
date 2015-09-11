@@ -159,10 +159,11 @@
                 android:layout_width="20dp"
                 android:layout_height="wrap_content"
                 android:text="Dead"
+                android:onClick="startRoshanCountdown"
                 style="@style/table_cell_style"/>
 
             <TextView
-                android:id="@+id/roshan_countdown"
+                android:id="@+id/roshan_countdown_display"
                 android:text="8:00"
                 style="@style/table_cell_style"/>
 
@@ -192,7 +193,7 @@
                 style="@style/table_cell_style"/>
 
             <TextView
-                android:id="@+id/aegis_countdown"
+                android:id="@+id/aegis_countdown_display"
                 android:text="6:00"
                 style="@style/table_cell_style"/>
 

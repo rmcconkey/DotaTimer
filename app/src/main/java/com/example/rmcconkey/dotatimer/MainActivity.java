@@ -32,8 +32,8 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private TextView mainClockMinutes;
     private TextView mainClockSeconds;
 
-    private TextView roshanCountdown;
-    private TextView aegisCountdown;
+    private TextView roshanCountdownDisplay;
+    private TextView aegisCountdownDisplay;
 
     private TextView neutralCampAlertTimeDisplay;
     private TextView runeAlertTimeDisplay;
@@ -49,6 +49,14 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private int runeAlertTime;
     private int roshanAlertTime;
     private int aegisAlertTime;
+
+    private int roshanCountdownMinutes = 8;
+    private int roshanCountdownSeconds = 0;
+    private int aegisCountdownMinutes = 6;
+    private int aegisCountdownSeconds = 0;
+
+    private boolean isRoshanCountingdown = false;
+    private boolean isAegisCountingdown = false;
 
     private boolean neutralAlertEnabled = true;
     private boolean runeAlertEnabled = true;
@@ -91,8 +99,8 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         mainClockMinutes = (TextView)findViewById(R.id.mainClockMinutes);
         mainClockSeconds = (TextView)findViewById(R.id.mainClockSeconds);
 
-        roshanCountdown = (TextView)findViewById(R.id.roshan_countdown);
-        aegisCountdown = (TextView)findViewById(R.id.aegis_countdown);
+        roshanCountdownDisplay = (TextView)findViewById(R.id.roshan_countdown_display);
+        aegisCountdownDisplay = (TextView)findViewById(R.id.aegis_countdown_display);
 
         neutralCampAlertTimeDisplay = (TextView)findViewById(R.id.neutral_camp_alert_time_display);
         runeAlertTimeDisplay = (TextView)findViewById(R.id.rune_alert_time_display);
@@ -359,7 +367,10 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         if (hours>9) {
             hours = 0;
         }
+
         updateMainClock();
+
+        updateCountdownTimers();
 
         checkTimers();
     }
@@ -379,6 +390,48 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         if (minutes%2==1 && seconds==runeAlertTime && runeAlertEnabled) {
             Toast.makeText(this, "Rune Alert!", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void updateCountdownTimers() {
+        String text;
+        if (roshanSwitch.isChecked() && isRoshanCountingdown) {
+            if (roshanCountdownSeconds == 0) {
+                roshanCountdownMinutes--;
+                roshanCountdownSeconds = 59;
+            } else {
+                roshanCountdownSeconds--;
+            }
+            if (roshanCountdownSeconds<10) {
+                text = String.valueOf(roshanCountdownMinutes) + ":0" + String.valueOf(roshanCountdownSeconds);
+            } else {
+                text = String.valueOf(roshanCountdownMinutes) + ":0" + String.valueOf(roshanCountdownSeconds);
+            }
+            roshanCountdownDisplay.setText(text);
+        }
+
+        if (aegisSwitch.isChecked() && isAegisCountingdown) {
+            if (aegisCountdownSeconds == 0) {
+                aegisCountdownMinutes--;
+                aegisCountdownSeconds = 59;
+            } else {
+                aegisCountdownSeconds--;
+            }
+            if (aegisCountdownSeconds<10) {
+                text = String.valueOf(aegisCountdownMinutes) + ":0" + String.valueOf(aegisCountdownSeconds);
+            } else {
+                text = String.valueOf(aegisCountdownMinutes) + ":" + String.valueOf(aegisCountdownSeconds);
+            }
+            aegisCountdownDisplay.setText(text);
+        }
+    }
+
+    public void startRoshanCountdown(View view){
+        isRoshanCountingdown = true;
+        isAegisCountingdown = true;
+        roshanCountdownMinutes = 8;
+        roshanCountdownSeconds = 0;
+        aegisCountdownMinutes = 6;
+        aegisCountdownSeconds = 0;
     }
 
     public void setAlertTime(View view) {
