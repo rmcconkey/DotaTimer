@@ -31,8 +31,8 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private Runnable timerRunnable;
     private int handlerDelay;
 
-    private enum TimeValueType { HOURS, MINUTES, SECONDS};
-    private enum AlertType {NEUTRAL_CAMP, RUNE, AEGIS_RECLAIM};
+    private enum TimeValueType { HOURS, MINUTES, SECONDS}
+    private enum AlertType {NEUTRAL_CAMP, RUNE, AEGIS_RECLAIM}
 
     private TextView mainClockHours;
     private TextView mainClockMinutes;
@@ -100,8 +100,6 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private boolean plays = false, loaded = false;
 
     private Date syncTimeStart;
-    private boolean adjustByTen = true;
-    private boolean firstTimeAdjustment = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +107,6 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         setContentView(R.layout.activity_main);
 
         prefs = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        handlerDelay = prefs.getInt("handler delay", 1000);
-
 
         mainClockHours = (TextView)findViewById(R.id.mainClockHours);
         mainClockMinutes = (TextView)findViewById(R.id.mainClockMinutes);
@@ -152,6 +148,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
             }
         });
 
+        final Context context = this;
         syncButton = (Button)findViewById(R.id.syncButton);
         syncButton.setOnClickListener(new View.OnClickListener() {
 
@@ -174,6 +171,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
                         }
                     };
                     timerHandler.postDelayed(timerRunnable, 0);
+                    Toast.makeText(context, "Handler started with delay " + handlerDelay, Toast.LENGTH_LONG).show();
                     isMainClockEnabled = true;
                     firstTick = true;
                     syncTimeStart = new Date(System.currentTimeMillis());
@@ -206,11 +204,6 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
     }
 
-    public void reportTime(View view) {
-        Date date = new Date(System.currentTimeMillis());
-        Toast.makeText(this, Long.toString(date.getTime()), Toast.LENGTH_LONG).show();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -241,7 +234,6 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         aegisSwitch.setChecked(prefs.getBoolean(AEGIS_SWITCH, false));
         aegisAlertEnabled = prefs.getBoolean(AEGIS_SWITCH, false);
 
-        adjustByTen = prefs.getBoolean(ADJUST_BY_TEN, true);
         handlerDelay = prefs.getInt(HANDLER_DELAY, 1000);
     }
 
@@ -289,7 +281,6 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         editor.putBoolean(ROSHAN_SWITCH, roshanSwitch.isChecked());
         editor.putBoolean(AEGIS_SWITCH, aegisSwitch.isChecked());
 
-        editor.putBoolean(ADJUST_BY_TEN, adjustByTen);
         editor.putInt(HANDLER_DELAY, handlerDelay);
 
         editor.apply();
@@ -465,38 +456,19 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         if (mainClockTime%5 == 0) {
             Toast.makeText(this, "Difference: " + Long.toString(mainClockTime - gameTimeLength), Toast.LENGTH_SHORT).show();
             if (mainClockTime-gameTimeLength > 0 && seconds != 0) {
-                playBeepSound();
-                adjustHandlerDelayUp();
+                handlerDelay++;
                 seconds--;
-            } else if (mainClockTime-gameTimeLength < 0 && seconds != 0) {
                 playBeepSound();
-                adjustHandlerDelayDown();
+                Toast.makeText(this, "handlerDelay changed to " + handlerDelay, Toast.LENGTH_LONG).show();
+            } else if (mainClockTime-gameTimeLength < 0 && seconds != 0) {
+                handlerDelay--;
                 seconds++;
+                playBeepSound();
+                Toast.makeText(this, "handlerDelay changed to " + handlerDelay, Toast.LENGTH_LONG).show();
             }
         }
     }
 
-    private void adjustHandlerDelayUp() {
-        int previousDelay = handlerDelay;
-        if (adjustByTen) {
-            handlerDelay += 10;
-        } else {
-            handlerDelay++;
-        }
-        firstTimeAdjustment = false;
-        Toast.makeText(this, "handlerDelay changed from " + previousDelay + " to " + handlerDelay, Toast.LENGTH_LONG).show();
-    }
-
-    private void adjustHandlerDelayDown() {
-        int previousDelay = handlerDelay;
-        if (adjustByTen) {
-            handlerDelay -= 10;
-        } else {
-            handlerDelay--;
-        }
-        firstTimeAdjustment = false;
-        Toast.makeText(this, "handlerDelay changed from " + previousDelay + " to " + handlerDelay, Toast.LENGTH_LONG).show();
-    }
 
 
     private void checkTimers() {

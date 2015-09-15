@@ -206,15 +206,6 @@
                 />
         </TableRow>
 
-        <TableRow>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time"
-                android:textSize="20dp"
-                android:onClick="reportTime"/>
-        </TableRow>
-
     </TableLayout>
 
 </RelativeLayout>
