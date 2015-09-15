@@ -2,14 +2,12 @@ package com.example.rmcconkey.dotatimer;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,11 +19,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 public class MainActivity extends Activity implements NumberPicker.OnValueChangeListener
 {
@@ -95,6 +89,8 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private static final String RUNE_ALERT_TIME = "rune alert time";
     private static final String ROSHAN_ALERT_TIME = "roshan alert time";
     private static final String AEGIS_ALERT_TIME = "aegis alert time";
+    private static final String ADJUST_BY_TEN = "adjust by ten";
+    private static final String HANDLER_DELAY = "handler delay";
 
     private AudioManager audioManager;
     private float actVolume, maxVolume, volume;
@@ -105,6 +101,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
     private Date syncTimeStart;
     private boolean adjustByTen = true;
+    private boolean firstTimeAdjustment = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -244,7 +241,8 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         aegisSwitch.setChecked(prefs.getBoolean(AEGIS_SWITCH, false));
         aegisAlertEnabled = prefs.getBoolean(AEGIS_SWITCH, false);
 
-        adjustByTen = prefs.getBoolean("adjust by ten", true);
+        adjustByTen = prefs.getBoolean(ADJUST_BY_TEN, true);
+        handlerDelay = prefs.getInt(HANDLER_DELAY, 1000);
     }
 
     private void updateAlertTimers() {
@@ -291,8 +289,8 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         editor.putBoolean(ROSHAN_SWITCH, roshanSwitch.isChecked());
         editor.putBoolean(AEGIS_SWITCH, aegisSwitch.isChecked());
 
-        editor.putBoolean("adjust by ten", adjustByTen);
-        editor.putInt("handler delay", handlerDelay);
+        editor.putBoolean(ADJUST_BY_TEN, adjustByTen);
+        editor.putInt(HANDLER_DELAY, handlerDelay);
 
         editor.apply();
 
@@ -468,13 +466,38 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
             Toast.makeText(this, "Difference: " + Long.toString(mainClockTime - gameTimeLength), Toast.LENGTH_SHORT).show();
             if (mainClockTime-gameTimeLength > 0 && seconds != 0) {
                 playBeepSound();
+                adjustHandlerDelayUp();
                 seconds--;
             } else if (mainClockTime-gameTimeLength < 0 && seconds != 0) {
                 playBeepSound();
+                adjustHandlerDelayDown();
                 seconds++;
             }
         }
     }
+
+    private void adjustHandlerDelayUp() {
+        int previousDelay = handlerDelay;
+        if (adjustByTen) {
+            handlerDelay += 10;
+        } else {
+            handlerDelay++;
+        }
+        firstTimeAdjustment = false;
+        Toast.makeText(this, "handlerDelay changed from " + previousDelay + " to " + handlerDelay, Toast.LENGTH_LONG).show();
+    }
+
+    private void adjustHandlerDelayDown() {
+        int previousDelay = handlerDelay;
+        if (adjustByTen) {
+            handlerDelay -= 10;
+        } else {
+            handlerDelay--;
+        }
+        firstTimeAdjustment = false;
+        Toast.makeText(this, "handlerDelay changed from " + previousDelay + " to " + handlerDelay, Toast.LENGTH_LONG).show();
+    }
+
 
     private void checkTimers() {
         checkNeutralCampTimer();
