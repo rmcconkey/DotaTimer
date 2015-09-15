@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,10 +23,25 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 public class MainActivity extends Activity implements NumberPicker.OnValueChangeListener
 {
 
     private final String TAG = this.getClass().getSimpleName();
+
+
+    private Handler timerHandler = new Handler();
+    private Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            tick();
+            timerHandler.postDelayed(this, 1000);
+        }
+    };
 
     private enum TimeValueType { HOURS, MINUTES, SECONDS};
     private enum AlertType {NEUTRAL_CAMP, RUNE, AEGIS_RECLAIM};
@@ -47,6 +63,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private int hours;
     private int minutes;
     private int seconds;
+    private boolean firstTick = true;
 
     private int neutralAlertTime;
     private int runeAlertTime;
@@ -92,20 +109,15 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private int soundID;
     private boolean plays = false, loaded = false;
 
-    private Handler timerHandler = new Handler();
-    private Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            tick();
-            timerHandler.postDelayed(this, 1000);
-        }
-    };
+    private Date syncTimeStart;
+    private boolean adjustByTen = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        prefs = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
 
         mainClockHours = (TextView)findViewById(R.id.mainClockHours);
         mainClockMinutes = (TextView)findViewById(R.id.mainClockMinutes);
@@ -156,16 +168,17 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
                 if (b.getText().equals("Stop")) {
                     timerHandler.removeCallbacks(timerRunnable);
                     isMainClockEnabled = false;
+                    syncTimeStart = null;
                     b.setText("Sync");
                 } else {
                     timerHandler.postDelayed(timerRunnable, 0);
                     isMainClockEnabled = true;
+                    firstTick = true;
+                    syncTimeStart = new Date(System.currentTimeMillis());
                     b.setText("Stop");
                 }
             }
         });
-
-        prefs = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
 
         // AudioManager audio settings for adjusting the volume
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -189,12 +202,24 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         });
         soundID = soundPool.load(this, R.raw.beep_07, 1);
 
+    }
 
+    public void reportTime(View view) {
+        Date date = new Date(System.currentTimeMillis());
+        Toast.makeText(this, Long.toString(date.getTime()), Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        // check if this is first time app is run
+        if (prefs.getBoolean("firstrun", true)) {
+            adjustByTen = true;
+            prefs.edit().putBoolean("adjust by ten", true);
+            prefs.edit().putBoolean("firstrun", false);
+            prefs.edit().apply();
+        }
 
         loadSettings();
         updateAlertTimers();
@@ -394,17 +419,21 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
     private void tick() {
 
-        seconds++;
-        if (seconds>59) {
-            seconds = 0;
-            minutes++;
-        }
-        if (minutes>59) {
-            minutes = 0;
-            hours++;
-        }
-        if (hours>9) {
-            hours = 0;
+        if (!firstTick) {
+            seconds++;
+            if (seconds>59) {
+                seconds = 0;
+                minutes++;
+            }
+            if (minutes>59) {
+                minutes = 0;
+                hours++;
+            }
+            if (hours>9) {
+                hours = 0;
+            }
+        } else {
+            firstTick = false;
         }
 
         updateMainClock();

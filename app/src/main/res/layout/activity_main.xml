@@ -131,7 +131,7 @@
 
             <TextView
                 android:id="@+id/rune_alert_time_display"
-                android:text="1:30"
+                android:text=":30"
                 android:onClick="setAlertTime"
                 style="@style/table_cell_style"/>
 
@@ -204,6 +204,15 @@
                 android:layout_gravity="right"
                 android:gravity="right"
                 />
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time"
+                android:textSize="20dp"
+                android:onClick="reportTime"/>
         </TableRow>
 
     </TableLayout>
