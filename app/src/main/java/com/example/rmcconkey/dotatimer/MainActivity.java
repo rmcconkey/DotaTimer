@@ -33,15 +33,9 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private final String TAG = this.getClass().getSimpleName();
 
 
-    private Handler timerHandler = new Handler();
-    private Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            tick();
-            timerHandler.postDelayed(this, 1000);
-        }
-    };
+    private Handler timerHandler;
+    private Runnable timerRunnable;
+    private int handlerDelay;
 
     private enum TimeValueType { HOURS, MINUTES, SECONDS};
     private enum AlertType {NEUTRAL_CAMP, RUNE, AEGIS_RECLAIM};
@@ -118,6 +112,8 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         setContentView(R.layout.activity_main);
 
         prefs = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        handlerDelay = prefs.getInt("handler delay", 1000);
+
 
         mainClockHours = (TextView)findViewById(R.id.mainClockHours);
         mainClockMinutes = (TextView)findViewById(R.id.mainClockMinutes);
@@ -171,6 +167,15 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
                     syncTimeStart = null;
                     b.setText("Sync");
                 } else {
+                    timerHandler= new Handler();
+                    timerRunnable = new Runnable() {
+
+                        @Override
+                        public void run() {
+                            tick();
+                            timerHandler.postDelayed(this, handlerDelay);
+                        }
+                    };
                     timerHandler.postDelayed(timerRunnable, 0);
                     isMainClockEnabled = true;
                     firstTick = true;
@@ -215,7 +220,6 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
         // check if this is first time app is run
         if (prefs.getBoolean("firstrun", true)) {
-            adjustByTen = true;
             prefs.edit().putBoolean("adjust by ten", true);
             prefs.edit().putBoolean("firstrun", false);
             prefs.edit().apply();
@@ -232,9 +236,15 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         aegisAlertTime = prefs.getInt(AEGIS_ALERT_TIME, 0);
 
         neutralCampSwitch.setChecked(prefs.getBoolean(NEUTRAL_SWITCH, false));
+        neutralAlertEnabled = prefs.getBoolean(NEUTRAL_SWITCH, false);
         runeSwitch.setChecked(prefs.getBoolean(RUNE_SWITCH, false));
+        runeAlertEnabled = prefs.getBoolean(RUNE_SWITCH, false);
         roshanSwitch.setChecked(prefs.getBoolean(ROSHAN_SWITCH, false));
+        roshanAlertEnabled = prefs.getBoolean(ROSHAN_SWITCH, false);
         aegisSwitch.setChecked(prefs.getBoolean(AEGIS_SWITCH, false));
+        aegisAlertEnabled = prefs.getBoolean(AEGIS_SWITCH, false);
+
+        adjustByTen = prefs.getBoolean("adjust by ten", true);
     }
 
     private void updateAlertTimers() {
@@ -260,7 +270,9 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     @Override
     public void onPause() {
         super.onPause();
-        timerHandler.removeCallbacks(timerRunnable);
+        if (timerHandler != null) {
+            timerHandler.removeCallbacks(timerRunnable);
+        }
         syncButton.setText("Sync");
 
         saveSettings();
@@ -278,6 +290,9 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         editor.putBoolean(RUNE_SWITCH, runeSwitch.isChecked());
         editor.putBoolean(ROSHAN_SWITCH, roshanSwitch.isChecked());
         editor.putBoolean(AEGIS_SWITCH, aegisSwitch.isChecked());
+
+        editor.putBoolean("adjust by ten", adjustByTen);
+        editor.putInt("handler delay", handlerDelay);
 
         editor.apply();
 
@@ -436,11 +451,29 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
             firstTick = false;
         }
 
+        checkMainClockAccuracy();
+
         updateMainClock();
 
         updateCountdownTimers();
 
         checkTimers();
+    }
+
+    private void checkMainClockAccuracy() {
+        long now = System.currentTimeMillis();
+        long gameTimeLength = (now - syncTimeStart.getTime())/1000;
+        long mainClockTime = hours*60*60 + minutes*60 + seconds;
+        if (mainClockTime%5 == 0) {
+            Toast.makeText(this, "Difference: " + Long.toString(mainClockTime - gameTimeLength), Toast.LENGTH_SHORT).show();
+            if (mainClockTime-gameTimeLength > 0 && seconds != 0) {
+                playBeepSound();
+                seconds--;
+            } else if (mainClockTime-gameTimeLength < 0 && seconds != 0) {
+                playBeepSound();
+                seconds++;
+            }
+        }
     }
 
     private void checkTimers() {
