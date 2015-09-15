@@ -176,7 +176,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         //Hardware buttons setting to adjust the media sound
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        // the counter will help us recognize the stream id of the sound played  now
+        // the counter will help us recognize the stream id of the sound played
         counter = 0;
 
         // Load the sounds
@@ -422,12 +422,14 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private void checkNeutralCampTimer() {
         if (seconds == neutralAlertTime && neutralAlertEnabled) {
             Toast.makeText(this, "Neutral Camp Alert!", Toast.LENGTH_LONG).show();
+            playNeutralCampWarningSound();
         }
     }
 
     private void checkRuneTimer() {
         if (minutes%2==1 && seconds==runeAlertTime && runeAlertEnabled) {
             Toast.makeText(this, "Rune Alert!", Toast.LENGTH_LONG).show();
+            playRuneSpawnWarningSound();
         }
     }
 
@@ -590,11 +592,27 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
     }
 
-    public void playSound(View view) {
+    private void playBeepSound() {
         if (loaded && !plays) {
             soundPool.play(soundID, volume, volume, 1, 0, 1f);
             counter = counter++;
             //plays = true;
         }
+    }
+
+    private void playNeutralCampWarningSound() {
+        playBeepSound();
+    }
+
+    private void playRuneSpawnWarningSound() {
+        playBeepSound();
+    }
+
+    private void playRoshanRespawnSound() {
+        playBeepSound();
+    }
+
+    private void playAegisReclaimSound() {
+        playBeepSound();
     }
 }
