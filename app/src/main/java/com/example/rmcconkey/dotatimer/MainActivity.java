@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -83,6 +85,13 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private static final String ROSHAN_ALERT_TIME = "roshan alert time";
     private static final String AEGIS_ALERT_TIME = "aegis alert time";
 
+    private AudioManager audioManager;
+    private float actVolume, maxVolume, volume;
+    private int counter;
+    private SoundPool soundPool;
+    private int soundID;
+    private boolean plays = false, loaded = false;
+
     private Handler timerHandler = new Handler();
     private Runnable timerRunnable = new Runnable() {
 
@@ -157,6 +166,29 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         });
 
         prefs = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+
+        // AudioManager audio settings for adjusting the volume
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        actVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        volume = actVolume / maxVolume;
+
+        //Hardware buttons setting to adjust the media sound
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        // the counter will help us recognize the stream id of the sound played  now
+        counter = 0;
+
+        // Load the sounds
+        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                loaded = true;
+            }
+        });
+        soundID = soundPool.load(this, R.raw.beep_07, 1);
+
 
     }
 
@@ -537,7 +569,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
                     neutralAlertTime = np1.getValue()*10 + np2.getValue();
                 } else if (alertType == AlertType.RUNE) {
                     runeAlertTime = np1.getValue()*10 + np2.getValue();
-                } else if (alertType == AlertType.AEGIS_RECLAIM.AEGIS_RECLAIM) {
+                } else if (alertType == AlertType.AEGIS_RECLAIM) {
                     aegisAlertTime = np1.getValue()*10 + np2.getValue();
                 } else {
                     Toast.makeText(context, "Error: timeValueType not set", Toast.LENGTH_LONG).show();
@@ -556,5 +588,13 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
         d.show();
 
+    }
+
+    public void playSound(View view) {
+        if (loaded && !plays) {
+            soundPool.play(soundID, volume, volume, 1, 0, 1f);
+            counter = counter++;
+            //plays = true;
+        }
     }
 }
