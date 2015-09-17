@@ -99,7 +99,9 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
     private int soundID;
     private boolean plays = false, loaded = false;
 
-    private Date syncTimeStart;
+    private long syncTimeStart;
+    private long mainClockInitialTime;
+    private boolean handlerDelayAdjusted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +160,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
                 if (b.getText().equals("Stop")) {
                     timerHandler.removeCallbacks(timerRunnable);
                     isMainClockEnabled = false;
-                    syncTimeStart = null;
+                    syncTimeStart = 0;
                     b.setText("Sync");
                 } else {
                     timerHandler= new Handler();
@@ -171,10 +173,12 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
                         }
                     };
                     timerHandler.postDelayed(timerRunnable, 0);
-                    Toast.makeText(context, "Handler started with delay " + handlerDelay, Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "Handler started with delay " + handlerDelay);
                     isMainClockEnabled = true;
                     firstTick = true;
-                    syncTimeStart = new Date(System.currentTimeMillis());
+                    handlerDelayAdjusted = false;
+                    mainClockInitialTime = hours*60*60 + minutes*60 + seconds;
+                    syncTimeStart = System.currentTimeMillis();
                     b.setText("Stop");
                 }
             }
@@ -234,7 +238,7 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
         aegisSwitch.setChecked(prefs.getBoolean(AEGIS_SWITCH, false));
         aegisAlertEnabled = prefs.getBoolean(AEGIS_SWITCH, false);
 
-        handlerDelay = prefs.getInt(HANDLER_DELAY, 1000);
+        handlerDelay = 994; //prefs.getInt(HANDLER_DELAY, 1000);
     }
 
     private void updateAlertTimers() {
@@ -451,25 +455,33 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
     private void checkMainClockAccuracy() {
         long now = System.currentTimeMillis();
-        long gameTimeLength = (now - syncTimeStart.getTime())/1000;
+        long gameTimeLength = (now - syncTimeStart)/1000;
         long mainClockTime = hours*60*60 + minutes*60 + seconds;
-        if (mainClockTime%5 == 0) {
-            Toast.makeText(this, "Difference: " + Long.toString(mainClockTime - gameTimeLength), Toast.LENGTH_SHORT).show();
-            if (mainClockTime-gameTimeLength > 0 && seconds != 0) {
-                handlerDelay++;
+        if (mainClockTime%12 == 0) {
+            long difference = mainClockTime - mainClockInitialTime - gameTimeLength;
+            String clockTime = Integer.toString(hours) + ":" + minutes + ":" + seconds;
+            Log.d(TAG, "clockTime = " + clockTime + "  gameTimeLength = " + gameTimeLength + "  mainClockTime = " + mainClockTime + "  mainClockInitialTime = " + mainClockInitialTime + "  difference = " + difference);
+            if (difference > 0 && seconds != 0) {
                 seconds--;
+                Log.d(TAG, "Adjusting seconds, subtracting 1");
                 playBeepSound();
-                Toast.makeText(this, "handlerDelay changed to " + handlerDelay, Toast.LENGTH_LONG).show();
-            } else if (mainClockTime-gameTimeLength < 0 && seconds != 0) {
-                handlerDelay--;
+                if (!handlerDelayAdjusted) {
+                    handlerDelay++;
+                    handlerDelayAdjusted = true;
+                    Log.d(TAG, "handlerDelay changed to " + handlerDelay);
+                }
+            } else if (difference < 0 && seconds != 0) {
                 seconds++;
+                Log.d(TAG, "Adjusting seconds, adding 1");
                 playBeepSound();
-                Toast.makeText(this, "handlerDelay changed to " + handlerDelay, Toast.LENGTH_LONG).show();
+                if (!handlerDelayAdjusted) {
+                    handlerDelay--;
+                    handlerDelayAdjusted = true;
+                    Log.d(TAG, "handlerDelay changed to " + handlerDelay);
+                }
             }
         }
     }
-
-
 
     private void checkTimers() {
         checkNeutralCampTimer();
@@ -647,6 +659,10 @@ public class MainActivity extends Activity implements NumberPicker.OnValueChange
 
         d.show();
 
+    }
+
+    public void playBeep(View view) {
+        playBeepSound();
     }
 
     private void playBeepSound() {
